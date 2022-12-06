@@ -1,4 +1,37 @@
+use std::{num::ParseIntError, str::FromStr};
+
 use regex::Regex;
+
+#[derive(Debug)]
+struct Move {
+    num: usize,
+    from: usize,
+    to: usize,
+}
+
+impl FromIterator<usize> for Move {
+    fn from_iter<T: IntoIterator<Item = usize>>(iter: T) -> Self {
+        let mut iter = iter.into_iter();
+
+        return Move {
+            num: iter.next().expect("num doesn't exist"),
+            from: iter.next().expect("from doesn't exist") - 1,
+            to: iter.next().expect("to doesn't exist") - 1,
+        };
+    }
+}
+
+impl FromStr for Move {
+    type Err = ParseIntError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        // `move 3 from 1 to 2` -> Move { num: 3, from: 1, to: 2 }
+        return Ok(s
+            .split_whitespace()
+            .filter_map(|op| op.parse::<usize>().ok())
+            .collect::<Move>());
+    }
+}
 
 pub fn process_part1(input: &str) -> String {
     // Separate crates from moves
@@ -31,23 +64,14 @@ pub fn process_part1(input: &str) -> String {
     }
 
     // Parse the operations and perform them
-    let re = Regex::new(r"(\d+)").unwrap();
     for &operation in operations.iter() {
-        // ops = [num, from, to]
-        let mut ops: Vec<usize> = Vec::with_capacity(3);
+        let mv: Move = operation
+            .parse::<Move>()
+            .expect(&format!("could not parse operation {}", operation));
+        let idx = stacks[mv.from].len() - mv.num;
 
-        for mat in re.find_iter(operation) {
-            let num_parsed = operation[mat.start()..mat.end()].parse::<usize>().unwrap();
-            ops.push(num_parsed);
-        }
-        let num = ops[0];
-        let from = ops[1] - 1;
-        let to = ops[2] - 1;
-
-        let idx = stacks[from].len() - num;
-
-        let mut removed = stacks[from].split_off(idx).into_iter().rev().collect();
-        stacks[to].append(&mut removed);
+        let mut removed = stacks[mv.from].split_off(idx).into_iter().rev().collect();
+        stacks[mv.to].append(&mut removed);
     }
 
     stacks
