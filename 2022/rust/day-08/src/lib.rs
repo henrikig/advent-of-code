@@ -110,16 +110,13 @@ pub fn process_part2(input: &str) -> u32 {
                 .0
                 + 1;
 
-            if left_viewing_distance
+            let view_score = left_viewing_distance
                 * right_viewing_distance
                 * upward_viewing_distance
-                * downward_viewing_distance
-                > current_best
-            {
-                current_best = left_viewing_distance
-                    * right_viewing_distance
-                    * upward_viewing_distance
-                    * downward_viewing_distance;
+                * downward_viewing_distance;
+
+            if view_score > current_best {
+                current_best = view_score;
             }
         }
     }
