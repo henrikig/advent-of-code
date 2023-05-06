@@ -88,7 +88,6 @@ fn get_pixel_value(current_pixel: (usize, usize), sprite_center: (usize, usize))
 fn draw_pixel(pixels: &mut [[&str; 40]; 6], cycle: i32, sprite_center: i32) {
     let cycle_pos = get_pos_from_num(cycle);
     let sprite_pos = get_pos_from_num(sprite_center);
-    dbg!(cycle_pos, sprite_pos, cycle);
     let pixel_value = get_pixel_value(cycle_pos, sprite_pos);
     pixels[cycle_pos.0][cycle_pos.1] = pixel_value;
 }
