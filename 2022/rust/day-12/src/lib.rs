@@ -1,44 +1,49 @@
-use std::fmt::Display;
+use std::{fmt::Display, str::FromStr};
 
-struct Maze {
-    maze: Vec<Vec<usize>>,
-    start: Option<(usize, usize)>,
-    end: Option<(usize, usize)>,
+struct Grid {
+    grid: Vec<Vec<usize>>,
+    start: usize,
+    end: usize,
 }
 
-impl Maze {
-    pub fn new(input: &str) -> Result<Maze, &'static str> {
-        let mut maze = Vec::with_capacity(input.len());
+impl FromStr for Grid {
+    type Err = &'static str;
+
+    fn from_str(input: &str) -> Result<Grid, &'static str> {
+        let lines: Vec<&str> = input.lines().collect();
+        let mut grid = Vec::with_capacity(lines.len());
         let mut start = None;
         let mut end = None;
-        for (row_num, line) in input.lines().enumerate() {
-            let mut row = Vec::with_capacity(line.len());
+        for (row_num, line) in lines.iter().enumerate() {
+            let length = line.len();
+            let mut row = Vec::with_capacity(length);
             for (col, c) in line.chars().enumerate() {
                 match c {
                     'S' => {
                         row.push('a' as usize - 'a' as usize);
-                        start = Some((row_num, col));
+                        start = Some(row_num * length + col);
                     }
                     'E' => {
                         row.push('z' as usize - 'a' as usize);
-                        end = Some((row_num, col));
+                        end = Some(row_num * length + col);
                     }
                     'a'..='z' => row.push(c as usize - 'a' as usize),
                     _ => (),
                 }
             }
-            maze.push(row);
+            grid.push(row);
         }
-        if start.is_none() || end.is_none() {
-            return Err("No start or end found");
-        }
-        Ok(Maze { maze, start, end })
+        return Ok(Grid {
+            grid,
+            start: start.unwrap(),
+            end: end.unwrap(),
+        });
     }
 }
 
-impl Display for Maze {
+impl Display for Grid {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        for row in &self.maze {
+        for row in &self.grid {
             for col in row {
                 write!(f, "{:2} ", col)?;
             }
@@ -48,9 +53,29 @@ impl Display for Maze {
     }
 }
 
+struct Node(u32);
+
+struct Edge(u32, u32);
+
+struct Graph {
+    edges: Vec<Edge>,
+}
+
+impl Graph {
+    pub fn new(edges: Vec<Edge>) -> Self {
+        Graph { edges }
+    }
+}
+
+impl From<Grid> for Graph {
+    fn from(grid: Grid) -> Self {
+        todo!();
+    }
+}
+
 pub fn process_part1(input: &str) -> usize {
-    let maze = Maze::new(input).unwrap();
-    println!("{}", maze);
+    let grid = Grid::from_str(input).unwrap();
+    println!("{}", grid);
     return 32;
 }
 
