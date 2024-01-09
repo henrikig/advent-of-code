@@ -34,3 +34,5 @@ Cargo.lock
 
 # Go workspace file
 go.work
+
+input.txt
