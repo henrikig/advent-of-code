@@ -46,7 +46,7 @@ func Test_part2(t *testing.T) {
 		{
 			name:  "example",
 			input: example2,
-			want:  281,
+			want:  2286,
 		},
 	}
 	for _, tt := range tests {

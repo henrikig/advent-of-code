@@ -31,58 +31,66 @@ var bag = map[string]int{
 	"blue":  14,
 }
 
-type game struct {
-	gameNum int
-	rounds  []round
-}
-
-type round struct {
-	draws map[string]int
-}
-
-func parseInput(input string) []game {
+func part1(input string) int {
 	lines := strings.Split(input, "\n")
-	games := make([]game, len(lines))
+	sum := 0
 
-	for i, line := range lines {
-		split_line := strings.Split(line, ":")
+Game:
+	for _, line := range lines {
+		game, rounds, _ := strings.Cut(line, ":")
 		var gameNum int
-		fmt.Sscanf(split_line[0], "Game %d", &gameNum)
-		for _, record := range strings.Split(split_line[1], ";") {
-			var rounds []round
-			record = strings.TrimSpace(record)
-			for _, draw := range strings.Split(record, ", ") {
+		fmt.Sscanf(game, "Game %d", &gameNum)
+
+		for _, round := range strings.Split(rounds, ";") {
+			round = strings.TrimSpace(round)
+
+			for _, draw := range strings.Split(round, ", ") {
 				var color string
 				var amount int
 				fmt.Sscanf(draw, "%d %s", &amount, &color)
-				round := round{
-					color:  color,
-					amount: amount,
+				if amount > bag[color] {
+					continue Game
 				}
-				rounds = append(rounds, round)
 			}
 		}
-		game := game{
-			gameNum: gameNum,
-			rounds:  rounds,
-		}
-		games[i] = game
+		sum += gameNum
 	}
-
-	return games
-}
-
-func part1(input string) int {
-	games := parseInput(input)
-	for _, game := range games {
-		for _, round := range game.rounds {
-			fmt.Println(game.gameNum, round)
-			fmt.Println()
-		}
-	}
-	return 42
+	return sum
 }
 
 func part2(input string) int {
-	return 42
+	lines := strings.Split(input, "\n")
+	sum := 0
+
+	for _, game := range lines {
+		var max_map = map[string]int{
+			"red":   0,
+			"green": 0,
+			"blue":  0,
+		}
+
+		_, rounds, _ := strings.Cut(game, ":")
+		for _, round := range strings.Split(rounds, ";") {
+			round = strings.TrimSpace(round)
+
+			for _, draw := range strings.Split(round, ", ") {
+				var color string
+				var amount int
+				fmt.Sscanf(draw, "%d %s", &amount, &color)
+				if amount > max_map[color] {
+					max_map[color] = amount
+				}
+			}
+		}
+		sum += multiplyMapValues(max_map)
+	}
+	return sum
+}
+
+func multiplyMapValues(m map[string]int) int {
+	sum := 1
+	for _, value := range m {
+		sum *= value
+	}
+	return sum
 }
